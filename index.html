@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inject Solar LLP - Office Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        /* Custom Skeuomorphic Styles */
+        .neu-button {
+            background: linear-gradient(145deg, #e6e6e6, #ffffff);
+            box-shadow: 8px 8px 16px #d1d1d1, -8px -8px 16px #ffffff;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .neu-button:hover {
+            box-shadow: inset 4px 4px 8px #d1d1d1, inset -4px -4px 8px #ffffff;
+        }
+        .neu-input {
+            background: #f0f0f0;
+            box-shadow: inset 4px 4px 8px #d1d1d1, inset -4px -4px 8px #ffffff;
+            border-radius: 10px;
+        }
+        .neu-card {
+            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            box-shadow: 8px 8px 16px #d1d1d1, -8px -8px 16px #ffffff;
+            border-radius: 20px;
+        }
+        #dashboard, #cardInventory, #cardTransfer, #assembly, #puneOffice, #sale, #clientManagement, #careers {
+            display: none;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f0f0;
+        }
+        .modal {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Login Section -->
+    <div id="loginSection" class="min-h-screen flex items-center justify-center p-4">
+        <div class="neu-card p-8 w-full max-w-md">
+            <h2 class="text-2xl font-bold text-center mb-6">Inject Solar LLP</h2>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Username</label>
+                    <input type="text" class="neu-input w-full p-3 outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Password</label>
+                    <input type="password" class="neu-input w-full p-3 outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">User Type</label>
+                    <select class="neu-input w-full p-3 outline-none" id="userType">
+                        <option value="master">Master User</option>
+                        <option value="manager">Managerial User</option>
+                        <option value="general">General User</option>
+                        <option value="guest">Guest User</option>
+                    </select>
+                </div>
+                <div class="flex items-center mb-4">
+                    <input type="checkbox" id="officeSelect" class="neu-input mr-2">
+                    <label for="officeSelect">Pune Office</label>
+                </div>
+                <button type="button" onclick="login()" class="neu-button w-full py-3 px-6 text-center font-medium">
+                    Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="hidden">
+        <!-- Navigation -->
+        <nav class="neu-card p-4 fixed w-full top-0 z-50">
+            <div class="flex flex-wrap justify-between items-center">
+                <h1 class="text-xl font-bold">Office Management System</h1>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="showSection('dashboard')" class="neu-button px-4 py-2">Dashboard</button>
+                    <button onclick="showSection('cardInventory')" class="neu-button px-4 py-2">Card Inventory</button>
+                    <button onclick="showSection('cardTransfer')" class="neu-button px-4 py-2">Card Transfer</button>
+                    <button onclick="showSection('assembly')" class="neu-button px-4 py-2">Assembly</button>
+                    <button onclick="showSection('puneOffice')" class="neu-button px-4 py-2">Pune Office</button>
+                    <button onclick="showSection('sale')" class="neu-button px-4 py-2">Sale</button>
+                    <button onclick="showSection('clientManagement')" class="neu-button px-4 py-2">Client Management</button>
+                    <button onclick="showSection('careers')" class="neu-button px-4 py-2">Careers</button>
+                    <button onclick="logout()" class="neu-button px-4 py-2">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content Sections -->
+        <div class="mt-24 p-6">
+            <!-- Dashboard -->
+            <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="neu-card p-6">
+                    <h3 class="text-lg font-semibold mb-4">PCB Board Statistics</h3>
+                    <div class="space-y-2">
+                        <p>Total Boards: <span id="totalBoards">150</span></p>
+                        <p>Pending Inspection: <span id="pendingInspection">25</span></p>
+                        <p>Completed Today: <span id="completedToday">15</span></p>
+                    </div>
+                </div>
+                <div class="neu-card p-6">
+                    <h3 class="text-lg font-semibold mb-4">Recent Activities</h3>
+                    <div id="recentActivities" class="space-y-2">
+                        <!-- Activities will be populated dynamically -->
+                    </div>
+                </div>
+                <div class="neu-card p-6">
+                    <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+                    <div class="space-y-2">
+                        <button onclick="showCardForm()" class="neu-button w-full p-2">Add New Card</button>
+                        <button onclick="showTransferForm()" class="neu-button w-full p-2">New Transfer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Inventory -->
+            <div id="cardInventory" class="space-y-6">
+                <div class="neu-card p-6">
+                    <h2 class="text-xl font-bold mb-6">Card Inventory Master</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <button onclick="showCardDetails('BASE_CARD')" class="neu-button p-4">BASE CARD common</button>
+                        <button onclick="showCardDetails('LOGX_PRO')" class="neu-button p-4">LOG X PRO_GSM CARD</button>
+                        <button onclick="showCardDetails('4G_TOP')" class="neu-button p-4">4G TOP cards</button>
+                        <button onclick="showCardDetails('4G_NEW')" class="neu-button p-4">4G New_A7672S</button>
+                        <button onclick="showCardDetails('LOGX_WIFI')" class="neu-button p-4">LOGX PRO _WIFI</button>
+                        <button onclick="showCardDetails('LAN_TOP')" class="neu-button p-4">LAN TOP CARDS</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Details Modal -->
+            <div id="cardDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+                <div class="neu-card p-6 w-full max-w-2xl">
+                    <h3 class="text-xl font-bold mb-4">Card Details</h3>
+                    <form id="cardDetailsForm" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" placeholder="Card No" class="neu-input p-2">
+                            <input type="text" placeholder="IMEI NO" class="neu-input p-2">
+                            <input type="text" placeholder="Batch No" class="neu-input p-2">
+                            <input type="text" placeholder="Batch No details" class="neu-input p-2">
+                            <input type="date" placeholder="Mfg. date" class="neu-input p-2">
+                            <input type="text" placeholder="Firmware Version" class="neu-input p-2">
+                            <input type="text" placeholder="Schematic Version" class="neu-input p-2">
+                            <input type="text" placeholder="Layout Version" class="neu-input p-2">
+                            <input type="text" placeholder="Card Programmed for" class="neu-input p-2">
+                            <input type="text" placeholder="Parameters 100/40" class="neu-input p-2">
+                            <input type="text" placeholder="HMI details" class="neu-input p-2">
+                            <input type="date" placeholder="Testing Date" class="neu-input p-2">
+                        </div>
+                        <textarea placeholder="Comment" class="neu-input w-full p-2"></textarea>
+                        <div class="flex justify-end space-x-4">
+                            <button type="submit" class="neu-button px-6 py-2">Update</button>
+                            <button type="button" onclick="closeCardDetails()" class="neu-button px-6 py-2">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Careers Section -->
+            <div id="careers" class="neu-card p-6">
+                <h2 class="text-xl font-bold mb-6">Careers at Inject Solar LLP</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Available Positions -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-semibold">Available Positions</h3>
+                        <div class="neu-card p-4">
+                            <h4 class="font-medium">Solar Design Engineer</h4>
+                            <p class="text-sm">Experience: 2-5 years</p>
+                            <p class="text-sm">Location: Mumbai</p>
+                        </div>
+                        <div class="neu-card p-4">
+                            <h4 class="font-medium">IoT Developer</h4>
+                            <p class="text-sm">Experience: 3-6 years</p>
+                            <p class="text-sm">Location: Pune</p>
+                        </div>
+                        <div class="neu-card p-4">
+                            <h4 class="font-medium">PCB Design Engineer</h4>
+                            <p class="text-sm">Experience: 2-4 years</p>
+                            <p class="text-sm">Location: Mumbai</p>
+                        </div>
+                    </div>
+
+                    <!-- Application Form -->
+                    <div>
+                        <form id="jobApplication" class="space-y-4">
+                            <input type="text" placeholder="Full Name" class="neu-input w-full p-3" required>
+                            <input type="email" placeholder="Email Address" class="neu-input w-full p-3" required>
+                            <input type="tel" placeholder="Phone Number" class="neu-input w-full p-3" required>
+                            <select class="neu-input w-full p-3" required>
+                                <option value="">Select Position</option>
+                                <option value="solar">Solar Design Engineer</option>
+                                <option value="iot">IoT Developer</option>
+                                <option value="pcb">PCB Design Engineer</option>
+                            </select>
+                            <input type="number" placeholder="Years of Experience" class="neu-input w-full p-3" required>
+                            <textarea placeholder="Cover Letter" class="neu-input w-full p-3 h-32" required></textarea>
+                            <div class="space-y-2">
+                                <label class="block text-sm">Upload Resume (PDF/DOC)</label>
+                                <input type="file" accept=".pdf,.doc,.docx" class="neu-input w-full p-3" required>
+                            </div>
+                            <button type="submit" class="neu-button w-full py-3">Submit Application</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Login functionality
+        function login() {
+            const userType = document.getElementById('userType').value;
+            const isPuneOffice = document.getElementById('officeSelect').checked;
+            
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            showSection('dashboard');
+            
+            // Set user permissions based on user type
+            setUserPermissions(userType, isPuneOffice);
+        }
+
+        // Logout functionality
+        function logout() {
+            document.getElementById('loginSection').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+
+        // Section display functionality
+        function showSection(sectionId) {
+            const sections = ['dashboard', 'cardInventory', 'cardTransfer', 'assembly', 'puneOffice', 'sale', 'clientManagement', 'careers'];
+            sections.forEach(section => {
+                document.getElementById(section).style.display = 'none';
+            });
+            document.getElementById(sectionId).style.display = 'block';
+        }
+
+        // Show card details modal
+        function showCardDetails(cardType) {
+            document.getElementById('cardDetailsModal').style.display = 'flex';
+        }
+
+        // Close card details modal
+        function closeCardDetails() {
+            document.getElementById('cardDetailsModal').style.display = 'none';
+        }
+
+        // Set user permissions
+        function setUserPermissions(userType, isPuneOffice) {
+            // Implementation would restrict access based on user type and office
+            console.log(`Setting permissions for ${userType} in ${isPuneOffice ? 'Pune' : 'Mumbai'} office`);
+        }
+
+        // Form submissions
+        document.getElementById('jobApplication').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Application submitted successfully! We will contact you soon.');
+            this.reset();
+        });
+
+        document.getElementById('cardDetailsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Card details updated successfully!');
+            closeCardDetails();
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
